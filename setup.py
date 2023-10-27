@@ -7,10 +7,10 @@ from setuptools import find_packages, setup, Command
 
 # Package meta-data.
 
-NAME = 'tg-logger'
+NAME = 'tg-log'
 DESCRIPTION = 'Logger with easy setup and sending errors to telegram'
 MODULE_NAME = 'tg_logger'
-URL = 'https://github.com/Nezhinskiy/tg-logger'
+URL = 'https://github.com/Nezhinskiy/tg-log'
 EMAIL = 'mikhail.nezhinsky@gmail.com'
 AUTHOR = 'Nezhinskiy'
 VERSION = None
