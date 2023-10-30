@@ -10,21 +10,25 @@ class BaseLogger:
 
     def __init__(
             self,
-            bot_token: str = False,
-            recipient_id: int = False
+            bot_token: str = None,
+            recipient_id: int = None,
     ) -> None:
+        from tg_logger.settings import logger_settings
         self.logger = logging.getLogger('app')
         self.start_time = datetime.now(timezone.utc)
-        if bot_token and recipient_id:
-            settings = SyncTgLoggerSettings(bot_token, recipient_id)
-        elif logger_settings is not None:
-            settings = logger_settings
-        else:
+        try:
+            if bot_token is None:
+                bot_token = logger_settings.bot_token
+            if recipient_id is None:
+                recipient_id = logger_settings.recipient_id
+        except AttributeError:
             raise ValueError(
-                "You must configure the logger using 'configure_logger' or "
-                "provide 'bot_token' and 'recipient_id' during initialization."
-            )
-        self.tg_logger = ClientLogger(settings)
+                'You must configure the logger using "configure_logger" or '
+                'provide "bot_token" and "recipient_id" during initialization.'
+            ) from AttributeError
+        else:
+            settings = SyncTgLoggerSettings(bot_token, recipient_id)
+            self.tg_logger = ClientLogger(settings)
 
     def __getattr__(self, name):
         if name.startswith('__') and name.endswith('__'):
