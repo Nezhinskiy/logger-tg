@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime, timezone
 
-from tg_logger.settings import SyncTgLoggerSettings, logger_settings
+from tg_logger.settings import SyncTgLoggerSettings
 from tg_logger.sync_logger.logger_warner import ClientLogger
 
 
@@ -67,10 +67,10 @@ class BaseLogger:
         log_method(f'{name}: {message}')
 
     def model_log(self, log_level, model, method, user=None, add_info=None):
-        msg = f'{model._meta.object_name} with id {model.pk} was {method}d.'
+        msg = f'{model.__class__.__name__} with id {model.pk} was {method}d.'
         if user:
             msg = (
-                f'{user} {method}d {model._meta.object_name}'
+                f'{user} {method} {model.__class__.__name__}'
                 f' with id {model.pk}.'
             )
         if add_info:
@@ -78,7 +78,7 @@ class BaseLogger:
         self.log_message('model_log', log_level, msg)
 
     def multiple_entities_log(self, log_level, model, method, add_info=None):
-        msg = f'{model._meta.object_name} was {method}d.'
+        msg = f'{model.__class__.__name__} was {method}d.'
         if add_info:
             msg += add_info
         self.log_message('multiple_entities_log', log_level, msg)
@@ -129,12 +129,6 @@ class ManagerLogger(BaseLogger):
     def change_proxy(self, log_level):
         msg = 'Changed proxy for client.'
         self.log_message('change_proxy', log_level, msg)
-
-    def update_tgbot(self, log_level, tgbot, number):
-        if isinstance(tgbot, self.tgbot_model):
-            msg = (f'Set to cache for update bot id={tgbot.tgbot_id}, '
-                   f'number={number}')
-            self.log_message('update_tgbot', log_level, msg)
 
     def send_payment_message(self, log_level, bot_id):
         msg = f'Set to cache for payment message bot id={bot_id}.'
