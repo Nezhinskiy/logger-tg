@@ -17,7 +17,8 @@ VERSION = None
 
 # What packages are required for this module to be executed?
 REQUIRED = [
-  'pyTelegramBotAPI>=4.14.0',
+    'aiohttp>=3.8.0',
+    'requests>=2.31.0'
 ]
 
 # The rest you shouldn't have to touch too much :)
