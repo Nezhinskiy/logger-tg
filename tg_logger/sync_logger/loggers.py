@@ -67,11 +67,12 @@ class BaseLogger:
         log_method(f'{name}: {message}')
 
     def model_log(self, log_level, model, method, user=None, add_info=None):
-        msg = f'{model.__class__.__name__} with id {model.pk} was {method}d.'
+        msg = (f'{model.__class__.__name__} with {model.__dict__=} '
+               f'was {method=}.')
         if user:
             msg = (
                 f'{user} {method} {model.__class__.__name__}'
-                f' with id {model.pk}.'
+                f' with {model.__dict__=}.'
             )
         if add_info:
             msg += add_info
