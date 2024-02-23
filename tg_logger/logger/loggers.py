@@ -1,8 +1,9 @@
 import logging
 from datetime import datetime, timezone
 
+from tg_logger.logger.logger_warner import ClientLogger
 from tg_logger.settings import SyncTgLoggerSettings
-from tg_logger.sync_logger.logger_warner import ClientLogger
+from tg_logger.utils import model_dict_or_none
 
 
 class BaseLogger:
@@ -28,7 +29,7 @@ class BaseLogger:
             ) from AttributeError
         else:
             settings = SyncTgLoggerSettings(bot_token, recipient_id)
-            self.tg_logger = ClientLogger(settings)
+            self.tg_logger = ClientLogger(settings, self.logger)
 
     def __getattr__(self, name):
         if name.startswith('__') and name.endswith('__'):
@@ -67,12 +68,12 @@ class BaseLogger:
         log_method(f'{name}: {message}')
 
     def model_log(self, log_level, model, method, user=None, add_info=None):
-        msg = (f'{model.__class__.__name__} with {model.__dict__=} '
+        msg = (f'{model.__class__.__name__} with {model_dict_or_none(model)} '
                f'was {method=}.')
         if user:
             msg = (
                 f'{user} {method} {model.__class__.__name__}'
-                f' with {model.__dict__=}.'
+                f' with {model_dict_or_none(model)}.'
             )
         if add_info:
             msg += add_info
