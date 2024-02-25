@@ -7,11 +7,11 @@
 `logger-tg` is a Python package that seamlessly integrates logging with Telegram, allowing developers to receive log messages directly in a Telegram chat. This tool is especially useful for monitoring applications in real-time, receiving immediate error notifications, and keeping track of important information without the need to constantly check log files.
 
 ## Features
-- **Easy Integration: Set up with just a few lines of code.
-- **Real-Time Notifications: Receive log messages instantly on your Telegram.
-- **Flexible Logging Levels: Supports all standard logging levels (DEBUG, INFO, WARNING, ERROR, CRITICAL).
-- **Customizable: Easily configure the logger to suit your needs, including custom message formatting.
-- **Asynchronous Support: Utilizes asynchronous communication with Telegram for efficient message delivery.
+- **Easy Integration:** Set up with just a few lines of code.
+- **Real-Time Notifications:** Receive log messages instantly on your Telegram.
+- **Flexible Logging Levels:** Supports all standard logging levels (DEBUG, INFO, WARNING, ERROR, CRITICAL).
+- **Customizable:** Easily configure the logger to suit your needs, including custom message formatting.
+- **Asynchronous Support:** Utilizes asynchronous communication with Telegram for efficient message delivery.
 
 ## Installation
 `logger-tg` can be installed using pip. Ensure you have Python 3.6 or newer.
@@ -23,8 +23,8 @@ pip install logger-tg
 ## Quick Start
 To get started with `logger-tg`, you need to configure it with your Telegram bot token and recipient chat ID. Here's a quick guide:
 
-1. **Create a Telegram Bot: If you haven't already, create a bot by chatting with [BotFather](https://t.me/botfather) on Telegram and save the bot token.
-2. **Find Your Chat ID: You can use the `@userinfobot` on Telegram to find your chat ID.
+1. **Create a Telegram Bot:** If you haven't already, create a bot by chatting with [BotFather](https://t.me/botfather) on Telegram and save the bot token.
+2. **Find Your Chat ID:** You can use the `@userinfobot` on Telegram to find your chat ID.
 
 ## Basic Setup
 ```python
@@ -92,4 +92,4 @@ Contributions are welcome! If you'd like to contribute, please fork the reposito
 `logger-tg` is available under the MIT license. See the [LICENSE](LICENSE) file for more info.
 
 ## Acknowledgments
-Thanks to the authors of `aio-pika`.
+Thanks to the authors of `aiohttp`.
