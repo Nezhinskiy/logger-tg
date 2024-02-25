@@ -4,11 +4,19 @@ from datetime import datetime, timezone
 from logging.handlers import TimedRotatingFileHandler
 
 from tg_logger.logger.logger_warner import ClientLogger
-from tg_logger.settings import SyncTgLoggerSettings
+from tg_logger.settings import TgLoggerSettings
 from tg_logger.utils import model_dict_or_none
 
 
 class BaseLogger:
+    """
+    A base logger class that integrates with Telegram for error logging and
+    supports both console and file logging.
+
+    Attributes:
+    - shrug (str): A shrug emoji represented in characters.
+    - FORMATTER (logging.Formatter): Default logging formatter.
+    """
     shrug: str = ''.join(map(chr, (175, 92, 95, 40, 12484, 41, 95, 47, 175)))
     FORMATTER: logging.Formatter = logging.Formatter(
         '%(asctime)s %(levelname)s %(module)s %(funcName)s %(message)s'
@@ -25,6 +33,15 @@ class BaseLogger:
         self.tg_logger = self.configure_tg_logger(bot_token, recipient_id)
 
     def __getattr__(self, name: str) -> callable:
+        """
+        Allows dynamic access to logging methods based on attribute name.
+
+        Parameters:
+        - name (str): The logging method name.
+
+        Returns:
+        - callable: A function that logs a message with the specified level.
+        """
         if name.startswith('__') and name.endswith('__'):
             return super().__getattr__(name)
         return lambda *args, **kwargs: self.log_message(name, *args, **kwargs)
@@ -34,6 +51,17 @@ class BaseLogger:
             formatter: logging.Formatter = FORMATTER,
             level: int = logging.DEBUG
     ) -> logging.StreamHandler:
+        """
+        Creates a console log handler.
+
+        Parameters:
+        - formatter (logging.Formatter, optional): The formatter for the log
+            handler.
+        - level (int, optional): The log level.
+
+        Returns:
+        - logging.StreamHandler: The configured console log handler.
+        """
         console_log_handler = logging.StreamHandler(sys.stderr)
         console_log_handler.setFormatter(formatter)
         console_log_handler.setLevel(level)
@@ -46,6 +74,18 @@ class BaseLogger:
             level: int = logging.INFO,
             **kwargs
     ) -> TimedRotatingFileHandler:
+        """
+        Creates a file log handler.
+
+        Parameters:
+        - path (str): The path to the log file.
+        - formatter (logging.Formatter, optional): The formatter for the log handler.
+        - level (int, optional): The log level.
+        - **kwargs: Additional keyword arguments for TimedRotatingFileHandler.
+
+        Returns:
+        - TimedRotatingFileHandler: The configured file log handler.
+        """
         file_log_handler = TimedRotatingFileHandler(
             filename=kwargs.pop('filename', path), **kwargs
         )
@@ -58,6 +98,19 @@ class BaseLogger:
             bot_token: str,
             recipient_id: int
     ) -> ClientLogger:
+        """
+        Configures a Telegram logger.
+
+        Parameters:
+        - bot_token (str): The Telegram bot token.
+        - recipient_id (int): The Telegram recipient ID.
+
+        Returns:
+        - ClientLogger: The configured Telegram logger.
+
+        Raises:
+        - ValueError: If bot_token or recipient_id is not provided and cannot be found in settings.
+        """
         from tg_logger.settings import logger_settings
         try:
             if bot_token is None:
@@ -70,7 +123,7 @@ class BaseLogger:
                 'provide "bot_token" and "recipient_id" during initialization.'
             ) from AttributeError
         else:
-            settings = SyncTgLoggerSettings(bot_token, recipient_id)
+            settings = TgLoggerSettings(bot_token, recipient_id)
             return ClientLogger(settings, self.logger)
 
     def get_logger(
@@ -80,6 +133,20 @@ class BaseLogger:
             console_log_handler: logging.StreamHandler = None,
             file_log_handler: TimedRotatingFileHandler = None
     ) -> 'BaseLogger':
+        """
+        Configures a logger with optional console and file handlers.
+
+        Parameters:
+        - name (str, optional): The name of the logger.
+        - level (int, optional): The log level.
+        - console_log_handler (logging.StreamHandler, optional): A console log
+            handler.
+        - file_log_handler (TimedRotatingFileHandler, optional): A file log
+            handler.
+
+        Returns:
+        - BaseLogger: The configured logger.
+        """
         logger = logging.getLogger(name)
         if console_log_handler is not None:
             logger.addHandler(console_log_handler)
@@ -87,20 +154,26 @@ class BaseLogger:
             logger.addHandler(file_log_handler)
         if level is not None:
             logger.setLevel(level)
-        self.logger = logger
+        self.logger = self.tg_logger.logger = logger
         return self
 
-    def error(self, message) -> None:
+    def error(self, message: str) -> None:
+        """
+        Logs an error message and sends it to the configured Telegram chat.
+
+        Parameters:
+        - message (str): The error message.
+        """
         self.tg_logger.send_error(message)
         self.logger.error(message)
 
-    def info(self, message) -> None:
+    def info(self, message: str) -> None:
         self.logger.info(message)
 
-    def debug(self, message) -> None:
+    def debug(self, message: str) -> None:
         self.logger.debug(message)
 
-    def warning(self, message) -> None:
+    def warning(self, message: str) -> None:
         self.logger.warning(message)
 
     def log_message(
@@ -109,6 +182,14 @@ class BaseLogger:
             log_level: str,
             message: str = shrug,
     ) -> None:
+        """
+        Logs a message with a specified log level.
+
+        Parameters:
+        - name (str): The name associated with the log message.
+        - log_level (str): The log level ('error', 'info', 'debug', 'warning').
+        - message (str, optional): The log message. Defaults to a shrug emoji.
+        """
         try:
             log_method = super().__getattribute__(log_level.lower())
         except AttributeError:
@@ -116,7 +197,24 @@ class BaseLogger:
             log_method = self.error
         log_method(f'{name}: {message}')
 
-    def model_log(self, log_level, model, method, user=None, add_info=None):
+    def model_log(
+            self,
+            log_level: str,
+            model: object,
+            method: str,
+            user: str = None,
+            add_info: str = None
+    ) -> None:
+        """
+        Logs a message related to a model operation.
+
+        Parameters:
+        - log_level (str): The log level as a string.
+        - model (object): The model involved in the operation.
+        - method (str): The method or operation performed on the model.
+        - user (str, optional): The user performing the operation. Defaults to None.
+        - add_info (str, optional): Additional information to include in the log message. Defaults to None.
+        """
         msg = (f'{model.__class__.__name__} with {model_dict_or_none(model)} '
                f'was {method=}.')
         if user:
