@@ -204,6 +204,7 @@ class BaseLogger:
             name: str,
             log_level: str,
             message: str = shrug,
+            **kwargs
     ) -> None:
         """
         Logs a message with a specified log level.
@@ -212,13 +213,19 @@ class BaseLogger:
         - name (str): The name associated with the log message.
         - log_level (str): The log level ('error', 'info', 'debug', 'warning').
         - message (str, optional): The log message. Defaults to a shrug emoji.
+        - **kwargs: Additional keyword arguments to include in the log message.
         """
         try:
             log_method = super().__getattribute__(log_level.lower())
         except AttributeError:
             self.error(f'{name}: Invalid {log_level=}.')
             log_method = self.error
-        log_method(f'{name}: {message}')
+        log_msg = f'{name}: {message}'
+        kwargs_str = ' '.join(
+            f'{k}={v}' for k, v in kwargs.items()
+        ) if kwargs else ''
+        log_msg += kwargs_str
+        log_method(log_msg)
 
     def model_log(
             self,
