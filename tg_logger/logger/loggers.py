@@ -157,6 +157,16 @@ class BaseLogger:
         self.logger = self.tg_logger.logger = logger
         return self
 
+    def critical(self, message: str) -> None:
+        """
+        Logs a critical message and sends it to the configured Telegram chat.
+
+        Parameters:
+        - message (str): The critical message.
+        """
+        self.tg_logger.send_error(message)
+        self.logger.critical(message)
+
     def error(self, message: str) -> None:
         """
         Logs an error message and sends it to the configured Telegram chat.
