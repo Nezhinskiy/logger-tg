@@ -12,6 +12,7 @@
 - **Flexible Logging Levels:** Supports all standard logging levels (DEBUG, INFO, WARNING, ERROR, CRITICAL).
 - **Customizable:** Easily configure the logger to suit your needs, including custom message formatting.
 - **Asynchronous Support:** Utilizes asynchronous communication with Telegram for efficient message delivery.
+- **Dynamic Logging Methods:** Use custom method names to dynamically log messages at any level, enhancing code readability and simplifying the search for log output locations.
 
 ## Installation
 `logger-tg` can be installed using pip. Ensure you have Python 3.6 or newer.
@@ -34,10 +35,10 @@ from logger_tg import configure_logger, BaseLogger
 configure_logger(bot_token='your_bot_token', recipient_id=your_chat_id)
 
 # Initialize the logger
-logger = BaseLogger(name='MyAppLogger')
+logger = BaseLogger('MyAppLogger')
 
 # Start logging
-logger.info("This is a test message!")
+logger.info('This is a test message!')
 ```
 
 ## Configuration
@@ -49,21 +50,37 @@ from logging.handlers import TimedRotatingFileHandler
 from logger_tg import BaseLogger, TgLoggerSettings
 
 # File handler for logging to a file
-file_handler = TimedRotatingFileHandler('app.log', when="midnight", interval=1)
-file_handler.suffix = "%Y-%m-%d"
+file_handler = TimedRotatingFileHandler('app.log', when='midnight', interval=1)
+file_handler.suffix = '%Y-%m-%d'
 
 # Console handler for logging to stderr
 console_handler = logging.StreamHandler()
 
 # Initialize the logger with custom handlers
 logger = BaseLogger().get_logger(
-    name="MyAppLogger",
+    'MyAppLogger',
     console_log_handler=console_handler,
     file_log_handler=file_handler
 )
 
-logger.info("Logging to console and file.")
+logger.info('Logging to console and file.')
 ```
+
+## Dynamic Logging Methods
+`logger-tg` supports dynamic logging methods, allowing you to log messages at any level with a single line of code. This feature enhances flexibility and readability by letting you specify the log level directly in the method call.
+
+### Example
+```python
+from logger_tg import BaseLogger
+
+logger = BaseLogger(__name__)
+logger.dynamic_method('error', 'An error occurred!')
+# output:
+# ERROR: dynamic_method: An error occurred!
+```
+This will log an error message "dynamic_method: An error occurred!" using the dynamic method feature. The first argument after the method name specifies the log level, making it straightforward to adjust the severity of your logs on the fly.
+
+Using dynamic methods not only makes your code more intuitive but also simplifies locating where specific logs are generated, especially when debugging or monitoring your application.
 
 ## Advanced Usage
 `logger-tg` also supports asynchronous logging to Telegram, which can be particularly useful for applications with high logging throughput or when you wish to avoid blocking the main thread.
@@ -75,10 +92,10 @@ To log errors asynchronously to Telegram:
 import asyncio
 from logger_tg import BaseLogger
 
-logger = BaseLogger(name='AsyncAppLogger')
+logger = BaseLogger('AsyncAppLogger')
 
 async def log_error():
-    logger.error("Asynchronous error logging.")
+    logger.error('Asynchronous error logging.')
 
 # Running the asynchronous log function
 asyncio.run(log_error())

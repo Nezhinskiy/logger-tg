@@ -13,13 +13,21 @@ class ClientLogger:
     - MAX_MSG_LENGTH (int): Maximum length of a message that can be sent in a
         single Telegram message.
     - bot_token (str): Telegram bot token used for authentication.
-    - recipient_id (int): Telegram chat ID to which messages will be sent.
+    - recipient_id (int, int): Telegram chat ID to which messages will be sent.
     - logger (BaseLogger): Python logger for logging errors.
-    - Api_url (str): URL for the Telegram sendMessage API endpoint.
+    - api_url (str): URL for the Telegram sendMessage API endpoint.
     """
     MAX_MSG_LENGTH: int = 4096
 
     def __init__(self, settings: TgLoggerSettings, logger: 'BaseLogger'):
+        """
+        Initializes the ClientLogger with settings and a logger.
+
+        Parameters:
+        - settings (SyncTgLoggerSettings): Configuration settings containing
+            the bot token and recipient ID.
+        - logger (logging.Logger): Logger for logging errors.
+        """
         self.bot_token = settings.bot_token
         self.recipient_id = settings.recipient_id
         self.logger = logger

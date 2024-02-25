@@ -10,12 +10,15 @@ from tg_logger.utils import model_dict_or_none
 
 class BaseLogger:
     """
-    A base logger class that integrates with Telegram for error logging and
-    supports both console and file logging.
+    A base logger class that integrates with Telegram for error logging.
+    And supports both console and file logging.
 
     Attributes:
     - shrug (str): A shrug emoji represented in characters.
     - FORMATTER (logging.Formatter): Default logging formatter.
+    - logger (logging.Logger): The logger instance.
+    - start_time (datetime): The time the logger was initialized.
+    - tg_logger (ClientLogger): The Telegram logger instance.
     """
     shrug: str = ''.join(map(chr, (175, 92, 95, 40, 12484, 41, 95, 47, 175)))
     FORMATTER: logging.Formatter = logging.Formatter(
@@ -24,10 +27,18 @@ class BaseLogger:
 
     def __init__(
             self,
-            bot_token: str = None,
-            recipient_id: int = None,
             name: str = 'app',
+            bot_token: str = None,
+            recipient_id: str | int = None,
     ) -> None:
+        """
+        Initializes the BaseLogger with optional Telegram logging.
+
+        Parameters:
+        - name (str, optional): The name of the logger.
+        - bot_token (str, optional): The Telegram bot token.
+        - recipient_id (str, int, optional): The Telegram recipient ID.
+        """
         self.logger = logging.getLogger(name)
         self.start_time = datetime.now(timezone.utc)
         self.tg_logger = self.configure_tg_logger(bot_token, recipient_id)
@@ -79,7 +90,8 @@ class BaseLogger:
 
         Parameters:
         - path (str): The path to the log file.
-        - formatter (logging.Formatter, optional): The formatter for the log handler.
+        - formatter (logging.Formatter, optional): The formatter for
+            the log handler.
         - level (int, optional): The log level.
         - **kwargs: Additional keyword arguments for TimedRotatingFileHandler.
 
@@ -109,7 +121,8 @@ class BaseLogger:
         - ClientLogger: The configured Telegram logger.
 
         Raises:
-        - ValueError: If bot_token or recipient_id is not provided and cannot be found in settings.
+        - ValueError: If bot_token or recipient_id is not provided and cannot
+            be found in settings.
         """
         from tg_logger.settings import logger_settings
         try:
@@ -222,8 +235,10 @@ class BaseLogger:
         - log_level (str): The log level as a string.
         - model (object): The model involved in the operation.
         - method (str): The method or operation performed on the model.
-        - user (str, optional): The user performing the operation. Defaults to None.
-        - add_info (str, optional): Additional information to include in the log message. Defaults to None.
+        - user (str, optional): The user performing the operation.
+            Defaults to None.
+        - add_info (str, optional): Additional information to include in
+            the log message. Defaults to None.
         """
         msg = (f'{model.__class__.__name__} with {model_dict_or_none(model)} '
                f'was {method=}.')
