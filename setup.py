@@ -6,29 +6,28 @@ from shutil import rmtree
 from setuptools import Command, find_packages, setup
 
 # Package meta-data.
-
 NAME = 'logger-tg'
-DESCRIPTION = 'Logger with easy setup and sending errors to telegram'
+DESCRIPTION = 'Asynchronous Telegram logging for Python applications'
+LONG_DESCRIPTION_CONTENT_TYPE = 'text/markdown'
 MODULE_NAME = 'tg_logger'
 URL = 'https://github.com/Nezhinskiy/logger-tg'
 EMAIL = 'mikhail.nezhinsky@gmail.com'
-AUTHOR = 'Nezhinskiy'
+AUTHOR = 'Mikhail Nezhinsky'
+REQUIRES_PYTHON = '>=3.6.0'
 VERSION = None
 
 # What packages are required for this module to be executed?
 REQUIRED = [
-    'aiohttp>=3.8.0'
+    'aiohttp>=3.8.0',
 ]
 
 # The rest you shouldn't have to touch too much :)
-# ------------------------------------------------
 # Except, perhaps the License and Trove Classifiers!
 # If you do change the License, remember to change the Trove Classifier for that!
 
 here = os.path.abspath(os.path.dirname(__file__))
 
 # Import the README and use it as the long-description.
-# Note: this will only work if 'README.md' is present in your MANIFEST.in file!
 try:
     with io.open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
         long_description = '\n' + f.read()
@@ -38,7 +37,8 @@ except FileNotFoundError:
 # Load the package's __version__.py module as a dictionary.
 about = {}
 if not VERSION:
-    with open(os.path.join(here, MODULE_NAME, '__version__.py')) as f:
+    project_slug = MODULE_NAME.lower().replace("-", "_").replace(" ", "_")
+    with open(os.path.join(here, project_slug, '__version__.py')) as f:
         exec(f.read(), about)
 else:
     about['__version__'] = VERSION
@@ -46,7 +46,6 @@ else:
 
 class UploadCommand(Command):
     """Support setup.py upload."""
-
     description = 'Build and publish the package.'
     user_options = []
 
@@ -80,6 +79,7 @@ class UploadCommand(Command):
 
         sys.exit()
 
+
 # Where the magic happens:
 setup(
     name=NAME,
@@ -89,28 +89,29 @@ setup(
     long_description_content_type='text/markdown',
     author=AUTHOR,
     author_email=EMAIL,
+    python_requires=REQUIRES_PYTHON,
     url=URL,
-    packages=find_packages(exclude=('tests',)),
+    packages=find_packages(exclude=["tests", "*.tests", "*.tests.*", "tests.*"]),
     install_requires=REQUIRED,
     include_package_data=True,
     license='MIT',
     classifiers=[
-        # Trove classifiers
-        # Full list: https://pypi.python.org/pypi?%3Aaction=list_classifiers
+        'Development Status :: 5 - Production/Stable',
+        'Intended Audience :: Developers',
+        'Topic :: Software Development :: Libraries',
+        'Topic :: System :: Logging',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: Implementation :: CPython',
+        'Framework :: AsyncIO',
     ],
-    keywords=[
-        'logger', 'logging', 'telegram', 'telegram_logger', 'tg_logger',
-        'python'
-    ],
-    # $ setup.py publish support.
+    keywords='logger logging telegram async asyncio telegram_logger tg_logger python',
     cmdclass={
         'upload': UploadCommand,
     },
