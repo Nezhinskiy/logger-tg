@@ -30,6 +30,7 @@ class BaseLogger:
             name: str = 'app',
             bot_token: str = None,
             recipient_id: str | int = None,
+            logger: logging.Logger = None
     ) -> None:
         """
         Initializes the BaseLogger with optional Telegram logging.
@@ -39,7 +40,10 @@ class BaseLogger:
         - bot_token (str, optional): The Telegram bot token.
         - recipient_id (str, int, optional): The Telegram recipient ID.
         """
-        self.logger = logging.getLogger(name)
+        if logger is None:
+            self.logger = logging.getLogger(name)
+        else:
+            self.logger = logger
         self.start_time = datetime.now(timezone.utc)
         self.tg_logger = self.configure_tg_logger(bot_token, recipient_id)
 
@@ -138,37 +142,6 @@ class BaseLogger:
         else:
             settings = TgLoggerSettings(bot_token, recipient_id)
             return ClientLogger(settings, self.logger)
-
-    def get_logger(
-            self,
-            name: str = None,
-            level: int = None,
-            console_log_handler: logging.StreamHandler = None,
-            file_log_handler: TimedRotatingFileHandler = None
-    ) -> 'BaseLogger':
-        """
-        Configures a logger with optional console and file handlers.
-
-        Parameters:
-        - name (str, optional): The name of the logger.
-        - level (int, optional): The log level.
-        - console_log_handler (logging.StreamHandler, optional): A console log
-            handler.
-        - file_log_handler (TimedRotatingFileHandler, optional): A file log
-            handler.
-
-        Returns:
-        - BaseLogger: The configured logger.
-        """
-        logger = logging.getLogger(name)
-        if console_log_handler is not None:
-            logger.addHandler(console_log_handler)
-        if file_log_handler is not None:
-            logger.addHandler(file_log_handler)
-        if level is not None:
-            logger.setLevel(level)
-        self.logger = self.tg_logger.logger = logger
-        return self
 
     def critical(self, message: str) -> None:
         """

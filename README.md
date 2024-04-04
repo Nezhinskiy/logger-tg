@@ -47,7 +47,7 @@ Custom Log Handlers
 
 ```python
 from logging.handlers import TimedRotatingFileHandler
-from logger_tg import BaseLogger, TgLoggerSettings
+from logger_tg import BaseLogger, TgLoggerSettings, get_logger
 
 # File handler for logging to a file
 file_handler = TimedRotatingFileHandler('app.log', when='midnight', interval=1)
@@ -57,7 +57,7 @@ file_handler.suffix = '%Y-%m-%d'
 console_handler = logging.StreamHandler()
 
 # Initialize the logger with custom handlers
-logger = BaseLogger().get_logger(
+logger = get_logger(
     'MyAppLogger',
     console_log_handler=console_handler,
     file_log_handler=file_handler
