@@ -143,6 +143,22 @@ class BaseLogger:
             settings = TgLoggerSettings(bot_token, recipient_id)
             return ClientLogger(settings, self.logger)
 
+    def log(self, level: int, msg=shrug, *args, **kwargs):
+        """
+        Log 'msg % args' with the integer severity 'level'.
+
+        To pass exception information, use the keyword argument exc_info with
+        a true value, e.g.
+
+        logger.log(level, "We have a %s", "mysterious problem", exc_info=1)
+        """
+        if not isinstance(level, int):
+            raise TypeError("level must be an integer")
+
+        if self.logger.isEnabledFor(level):
+            level_name = logging.getLevelName(level).lower()
+            getattr(self, level_name)(msg, *args, **kwargs)
+
     def critical(self, message: str) -> None:
         """
         Logs a critical message and sends it to the configured Telegram chat.
