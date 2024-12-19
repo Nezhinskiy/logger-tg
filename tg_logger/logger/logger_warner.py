@@ -68,7 +68,7 @@ class ClientLogger:
                         response.raise_for_status()
                 except aiohttp.ClientError as e:
                     self.logger.error(f'Client error sending message: {e}')
-                except aiohttp.HttpProcessingError as e:
+                except aiohttp.http_exceptions.HttpProcessingError as e:
                     self.logger.error(f'HTTP error sending message: {e}')
                 except Exception as e:
                     self.logger.error(f'Unexpected error sending message: {e}')
